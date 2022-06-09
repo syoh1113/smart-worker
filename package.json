@@ -1,5 +1,7 @@
 {
   "dependencies": {
-    "puppeteer": "^14.2.1"
+    "puppeteer": "^14.2.1",
+    "request": "^2.88.2",
+    "xml-js": "^1.6.11"
   }
 }

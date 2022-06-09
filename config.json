@@ -3,5 +3,6 @@
     "account": {
         "id": "ENTER ID",
         "pwd": "ENTER PASSWORD"
-    }
+    },
+    "openAPIKey": "ENTER OPEN API KEY"
 }
