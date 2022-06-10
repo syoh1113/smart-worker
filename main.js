@@ -9,7 +9,7 @@ async function getWorkTime(configPath) {
     const jsonFile = fs.readFileSync(configPath, 'utf-8');
     const config = JSON.parse(jsonFile)
 
-    const browser = await puppeteer.launch({headless:true}); // 브라우저 실행 (여기서 headless:false 속성을 주면 브라우저가 열리고 닫히는 과정을 시각적으로 볼 수 있다.
+    const browser = await puppeteer.launch({executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', headless:false}); // 브라우저 실행 (여기서 headless:false 속성을 주면 브라우저가 열리고 닫히는 과정을 시각적으로 볼 수 있다.
     const page = await browser.newPage(); // 새로운 페이지 열기
     await page.setViewport({
       width: 1920,
@@ -244,12 +244,25 @@ async function getHoliday(savedPath, configPath, today) {
             }
         }
 
-        return days - noNeedToWorkDays.size
+        let remainDays = []
+        for (let d = 1; d <= days; d++) {
+            if (noNeedToWorkDays.has(d)) {
+                continue
+            }
+            remainDays.push(d)
+        }
+
+        return remainDays
     })()
 
-    console.log("남은 요일수:", remainDays)
+    console.log("남은 요일수:", remainDays.length, `(${remainDays})`)
     console.log("남은 근무시간:", parseInt(remainMinutes/60) + ":" + remainMinutes%60)
 
-    const remainMinuteAvg = remainMinutes/remainDays
+    const remainMinuteAvg = remainMinutes/remainDays.length
     console.log("평균 남은 일 평균 시간:", parseInt(remainMinuteAvg/60) + ":" + Math.ceil(remainMinuteAvg%60))
+
+    const combinations = [
+        ["", ""],
+        ["", ""]
+    ]
 })()
