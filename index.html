@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'">
+    <link href="./styles.css" rel="stylesheet">
+    <title>Smart Worker</title>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="display">
+        이번달 필수 근무시간: <span id="target_total_work_time"></span><br>
+        근무한 시간: <span id="total_worked_time"></span> (예정 근무 시간: <span id="planed_work_time"></span>)<br>
+        남은 시간: <span id="total_work_time_remained"></span> (예정 근무 시간 적용: <span id="total_work_time_remained_with_plan"></span>)<br>
+        남은 평일 근무 일수: <span id="total_day_count_remained"></span> (예정 포함: <span id="total_day_count_remained_with_plan"></span>)<br>
+        일 평균 남은 시간: <span id="avg_work_time_remained"></span> (예정 적용: <span id="avg_work_time_remained_with_plan"></span>)<br>
+      </div>
+      <div class="control">
+        openAPI:
+        <input id="getHolidaysText", type="text", value="">
+        <input id="getHolidaysBtn", type="button", value="공휴일 적용">
+        </br></br>
+        url:<input id="addressURLText", type="text", value="">
+        <input id="checkDebugWorkServer", type="checkbox">크롤링과정확인</br>
+        id:<input id="addressIdText", type="text", value=""></br>
+        pwd:<input id="addressPasswordText", type="password", value="">
+        <input id="getWorkedTimeBtn", type="button", value="근무시간 적용">
+        </br></br>
+        <input name="planCheckStartDate", type="number", min="1", max="31"> 일부터
+        <input name="planCheckEndDate", type="number", min="1", max="31"> 일까지
+        <input id="selectPlanCheckBtn", type="button", value="체크박스 선택">
+        </br></br>
+        <input id="selectAllPlanCheckBtn", type="button", value="체크박스 전체 선택">
+        <input id="clearAllPlanCheckBtn", type="button", value="체크박스 전체 선택 해제">
+        </br></br>
+        <input name="setHoliday", type="radio", value="0H", checked="checked"> 정상근무
+        <input name="setHoliday", type="radio", value="8H"> 연차 </br>
+        <input name="setHoliday", type="radio", value="4H_AM"> 오전반차 (13:00~)
+        <input name="setHoliday", type="radio", value="4H_PM"> 오후반차 (~12:00) </br>
+        <input name="setHoliday", type="radio", value="2H_AM"> 오전반반차 (11:00~)
+        <input name="setHoliday", type="radio", value="2H_PM"> 오후반반차 (~14:00)
+        </br></br>
+        출근 <input id="startTime" type="time" value="09:00"> ~
+        퇴근 <input id="endTime" type="time" value="18:00"> </br></br>
+        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+        &nbsp&nbsp
+        <input id="applyPlanBtn", type="button", value="적용">
+        <input id="savePlanBtn", type="button", value="저장">
+      </div>
+      <div class="withPrintConsole">
+        <input id="clearPrintConsole", type="button", value="로그 클리어">
+        <div class="printConsole"></div>
+      </div>
+      <div class="calendar">
+        <div class="month">
+          <ul>
+            <li><span id="this_year"></span>년 <span id="this_month"></span>월</li>
+          </ul>
+        </div>
+        
+        <ul class="weekdays">
+          <li style="color:red">일</li>
+          <li>월</li>
+          <li>화</li>
+          <li>수</li>
+          <li>목</li>
+          <li>금</li>
+          <li style="color:blue">토</li>
+        </ul>
+        
+        <ul class="days">
+      </div>
+    </div>
+    <!-- You can also require other files to run in this process -->
+    <script src="./renderer.js"></script>
+  </body>
+</html>
