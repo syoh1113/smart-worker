@@ -225,9 +225,28 @@ const planPath = "./plan.json"
             }
         }
 
-        const targetHours = Math.floor(40*(new Date(thisYear, thisMonth, 0).getDate()/7))
-        document.querySelector("#target_total_work_time").innerText = (targetHours-8*holidays.length)+":00"
-        document.querySelector("#total_work_time_remained_with_plan").innerText = (targetHours-8*holidays.length)+":00"
+        const targetHours = Math.floor(40*(new Date(thisYear, thisMonth, 0).getDate()/7)) - 8*holidays.length  // 역일 수 기반 총 근무시간
+        document.querySelector("#target_total_work_time").innerText = targetHours+":00"
+
+        // 예정 근무 시간 적용 = 역일 수 기반 총 근무 시간 - 근무한 시간 - 예정 근무 시간
+        const workedTimes = document.querySelector("#total_worked_time").innerText.split(":").map(x=>Number(x))
+        const plannedWorkTimes = document.querySelector("#planed_work_time").innerText.split(":").map(x=>Number(x))
+        let appliedPlanRemainedWorkTime = (targetHours * 60) - (workedTimes[0] * 60 + workedTimes[1]) - (plannedWorkTimes[0] * 60 + plannedWorkTimes[1])
+
+        console.log(appliedPlanRemainedWorkTime)
+
+        let isOver = ""
+        if (appliedPlanRemainedWorkTime < 0) {
+            isOver = "-"
+            appliedPlanRemainedWorkTime *= -1
+        }
+        document.querySelector("#total_work_time_remained_with_plan").innerText = isOver + Math.floor(appliedPlanRemainedWorkTime / 60).toString().padStart(2, '0') + ':' + (appliedPlanRemainedWorkTime % 60).toString().padStart(2, '0')
+        if (isOver == "-") {
+            document.querySelector("#total_work_time_remained_with_plan").setAttribute('style', 'color:red')
+        }
+        else {
+            document.querySelector("#total_work_time_remained_with_plan").setAttribute('style', 'color:black')
+        }
     }
 
     async function getWorkedTime(savedData, config, today) {
@@ -403,7 +422,6 @@ const planPath = "./plan.json"
         } catch (err) {
             console.log(err)
             printConsoleLog("로그인 후 정보를 가져오는 데 실패했습니다. 좀더 자세한 원인 파악이 필요합니다.")
-            await page.waitForTimeout(1000000)
             await browser.close()
         }
 
@@ -450,8 +468,26 @@ const planPath = "./plan.json"
         document.querySelector("#total_worked_time").innerText = parseInt(workedMinutes / 60) + ":" + workedMinutes % 60
         const targetMinutes = Number(document.querySelector("#target_total_work_time").innerText.split(':')[0]) * 60
         const remainMinutes = targetMinutes - workedMinutes
-        document.querySelector("#total_work_time_remained").innerText = parseInt(remainMinutes / 60) + ":" + remainMinutes % 60
-        document.querySelector("#total_work_time_remained_with_plan").innerText = parseInt(remainMinutes / 60) + ":" + remainMinutes % 60
+        document.querySelector("#total_work_time_remained").innerText = (parseInt(remainMinutes / 60)).toString().padStart(2, '0') + ":" + (remainMinutes % 60).toString().padStart(2, '0')
+
+        // 예정 근무 시간 적용 = 역일 수 기반 총 근무 시간 - 근무한 시간 - 예정 근무 시간
+        const targetHours = Number(document.querySelector("#target_total_work_time").innerText.split(":")[0])
+        const workedTimes2 = document.querySelector("#total_worked_time").innerText.split(":").map(x=>Number(x))
+        const plannedWorkTimes = document.querySelector("#planed_work_time").innerText.split(":").map(x=>Number(x))
+        let appliedPlanRemainedWorkTime = (targetHours * 60) - (workedTimes2[0] * 60 + workedTimes2[1]) - (plannedWorkTimes[0] * 60 + plannedWorkTimes[1])
+
+        let isOver = ""
+        if (appliedPlanRemainedWorkTime < 0) {
+            isOver = "-"
+            appliedPlanRemainedWorkTime *= -1
+        }
+        document.querySelector("#total_work_time_remained_with_plan").innerText = isOver + Math.floor(appliedPlanRemainedWorkTime / 60).toString().padStart(2, '0') + ':' + (appliedPlanRemainedWorkTime % 60).toString().padStart(2, '0')
+        if (isOver == "-") {
+            document.querySelector("#total_work_time_remained_with_plan").setAttribute('style', 'color:red')
+        }
+        else {
+            document.querySelector("#total_work_time_remained_with_plan").setAttribute('style', 'color:black')
+        }
 
         const daysCnt = new Date(thisYear, thisMonth, 0).getDate()
         const startDate = (() => {
@@ -476,11 +512,55 @@ const planPath = "./plan.json"
             }
             remainWorkedDay++
         }
+
+        let planedCnt = 0
+        let planedMinutes = 0
+        let nodesWithChkBox = calendarUl.querySelectorAll("#planSet")
+        for (let n of nodesWithChkBox) {
+            let planFlag = n.parentElement.parentElement.querySelector("#planFlag").innerText
+            let workTime = n.parentElement.parentElement.querySelector("#workedTime").innerText
+
+            if (planFlag != "[미정]") {
+                planedCnt++
+                let splited = workTime.split(' ')[1].split(':')
+                planedMinutes += (Number(splited[0]) * 60 + Number(splited[1]))
+            }
+        }
+
         document.querySelector("#total_day_count_remained").innerText = remainWorkedDay
-        document.querySelector("#total_day_count_remained_with_plan").innerText = remainWorkedDay
+        document.querySelector("#total_day_count_remained_with_plan").innerText = remainWorkedDay - planedCnt
         const remainAvgMinutes = remainMinutes / remainWorkedDay
         document.querySelector("#avg_work_time_remained").innerText = parseInt(remainAvgMinutes / 60).toString().padStart(2, '0') + ":" + parseInt(remainAvgMinutes % 60).toString().padStart(2, '0')
-        document.querySelector("#avg_work_time_remained_with_plan").innerText = parseInt(remainAvgMinutes / 60).toString().padStart(2, '0') + ":" + parseInt(remainAvgMinutes % 60).toString().padStart(2, '0')
+
+        const remainMinutesWithPlan = remainMinutes - planedMinutes
+        isOver = (() => {
+            if ((remainWorkedDay - planedCnt) > 0) {
+                if (remainMinutesWithPlan > 0) {
+                    return ""
+                }
+                else {
+                    return "-"
+                }
+            }
+            return ""
+        })()
+
+        document.querySelector("#avg_work_time_remained_with_plan").innerText = (() => {
+            if ((remainWorkedDay - planedCnt) < 0) {
+                return "남은 일수 0"
+            }
+            else {
+                const remainAvgMinutesWithPlan = remainMinutesWithPlan / (remainWorkedDay - planedCnt)
+                return isOver + parseInt(remainAvgMinutesWithPlan / 60).toString().padStart(2, '0') + ":" + parseInt(remainAvgMinutesWithPlan % 60).toString().padStart(2, '0')
+            }
+        })()
+        
+        if (isOver == "-" || (remainWorkedDay - planedCnt) < 0) {
+            document.querySelector("#avg_work_time_remained_with_plan").setAttribute('style', 'color:red')
+        }
+        else {
+            document.querySelector("#avg_work_time_remained_with_plan").setAttribute('style', 'color:black')
+        }
     }
 
     document.querySelector("#selectPlanCheckBtn").addEventListener('click', ()=>{
