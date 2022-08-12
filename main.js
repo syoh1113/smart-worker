@@ -1,7 +1,8 @@
 // Modules to control application life and create native browser window
 const {app, BrowserWindow} = require('electron')
 const path = require('path')
-const env = process.env.NODE_ENV || 'development';
+// const env = process.env.NODE_ENV || 'development';  // 이거는 개발용, electron-reload 패키지가 필요하면 사용
+const env = process.env.NODE_ENV;
 
 function createWindow () {
   // Create the browser window.
