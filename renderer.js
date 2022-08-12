@@ -180,14 +180,32 @@ const planPath = "./plan.json"
             }
 
             let holidays = []
-            for (let item of jsonRes.response.body.items.item) {
-                const date = item.locdate._text
-                const y = parseInt(date.substr(0, 4))
-                const m = parseInt(date.substr(4, 2))
-                const d = parseInt(date.substr(6, 2))
-                const day = new Date(y, m-1, d).getDay()
-                if (day != 0 && day != 6) {
-                    holidays.push(d)
+                        
+            // 대체공휴일이 없는 경우 제외
+            if (jsonRes.response.body.items.item != undefined) {
+                let items = []
+                // 대체 공휴일이 1개일 경우에 대한 처리
+                if (jsonRes.response.body.items.item.length == undefined) {
+                    items.push(jsonRes.response.body.items.item)
+                }
+                else {  // 대체 공휴일이 2개 이상일 경우에 대한 처리
+                    for (let item of jsonRes.response.body.items.item) {
+                        items.push(item)
+                    }
+                }
+
+                for (let item of items) {
+                    if (item.isHoliday._text != 'Y') {
+                        continue
+                    }
+                    const date = item.locdate._text
+                    const y = parseInt(date.substr(0, 4))
+                    const m = parseInt(date.substr(4, 2))
+                    const d = parseInt(date.substr(6, 2))
+                    const day = new Date(y, m-1, d).getDay()
+                    if (day != 0 && day != 6) {
+                        holidays.push(d)
+                    }
                 }
             }
 
