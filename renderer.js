@@ -304,13 +304,13 @@ const planPath = "./plan.json"
         }
 
         // 브라우저 실행 (여기서 headless:false 속성을 주면 브라우저가 열리고 닫히는 과정을 시각적으로 볼 수 있다.
-        printConsoleLog("근무시간 가져오기 시작")
+        printConsoleLog("근무시간 가져오기 시작(1/5)")
         const isDebug = !(document.querySelector("#checkDebugWorkServer").checked)
         const browser = await puppeteer.launch({executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', headless:isDebug});
         const page = await browser.newPage(); // 새로운 페이지 열기
         
         // 지정된 URL 접속
-        printConsoleLog("근무시간 페이지 여는 중...")
+        printConsoleLog("근무시간 페이지 여는 중...(2/5)")
         const url = document.querySelector("#addressURLText").value
         try {
             await page.goto(url, {waitUntil: 'networkidle2'})
@@ -356,7 +356,7 @@ const planPath = "./plan.json"
             return
         }
 
-        printConsoleLog("근무시간 페이지 로그인 중...")
+        printConsoleLog("근무시간 페이지 로그인 중...(3/5)")
         const account_id = document.querySelector("#addressIdText").value
         const account_password = document.querySelector("#addressPasswordText").value
         await page.evaluate('document.querySelector("#loginUserId").value = "' + account_id + '"' )
@@ -376,7 +376,7 @@ const planPath = "./plan.json"
         }
         
         try {
-            printConsoleLog("근무시간 페이지 내 관련 페이지로 이동 중...")
+            printConsoleLog("근무시간 페이지 내 관련 페이지로 이동 중...(4/5)")
             let target = '#leftMenuArea > li:nth-child(2) > button'
             await page.evaluate('(' + awaitSelector.toString() + ')("'+ target + '");')
             await page.evaluate("document.querySelector('" + target + "').click()")
@@ -400,7 +400,7 @@ const planPath = "./plan.json"
             }
 
             await page.evaluate('document.querySelector("#btnSearch").click()');
-            printConsoleLog("근무시간 페이지 내 근무시간 로딩 대기 중...")
+            printConsoleLog("근무시간 페이지 내 근무시간 로딩 대기 중...(5/5)")
             await page.waitForTimeout(3000);
 
             await page.evaluate('rawData = document.querySelectorAll("#userDayWorkHistoryGrid div.k-grid-content table tbody tr")')
